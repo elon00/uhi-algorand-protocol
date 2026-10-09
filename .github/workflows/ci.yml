@@ -22,7 +22,11 @@ jobs:
       - name: Install Python Dependencies
         run: |
           pip install --upgrade pip
-          pip install py-algorand-sdk
+          pip install py-algorand-sdk pynacl
+
+      - name: Run Strict Reality Gate V2 Suite
+        run: |
+          python scripts/reality_gate.py
 
       - name: Run Multi-Layer Genuine Green Verification Pipeline
         run: |

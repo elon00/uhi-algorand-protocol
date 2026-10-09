@@ -176,16 +176,19 @@ op_verify_human_citizen:
 
 // -------------------------------------------------------------------------
 // Method: deposit_x402_tax
-// Strict Atomic Group Validation: Enforces recipient, group size, and positive amount
+// Strict 3-Transaction Atomic Group Validation:
+// Txn 0: Consumer pays Provider (90% net)
+// Txn 1: Consumer pays Treasury Application Address (10% tax)
+// Txn 2: Consumer calls deposit_x402_tax on Application
 // -------------------------------------------------------------------------
 op_deposit_x402_tax:
-    // Group must contain at least 2 transactions (Payment + App Call)
+    // 1. Enforce complete 3-transaction group
     global GroupSize
-    int 2
-    >=
+    int 3
+    ==
     assert
 
-    // Verify first transaction is a real payment or asset transfer
+    // 2. Txn 0 (Provider payment) and Txn 1 (Treasury payment) must match asset/pay type
     gtxn 0 TypeEnum
     int pay
     ==
@@ -195,30 +198,59 @@ op_deposit_x402_tax:
     ||
     assert
 
-    // Verify payment recipient is strictly this contract's application address
-    gtxn 0 Receiver
+    gtxn 1 TypeEnum
+    gtxn 0 TypeEnum
+    ==
+    assert
+
+    // 3. Payer Authorization: Consumer must be the sender of Txn 0, Txn 1, and Txn 2
+    gtxn 0 Sender
+    gtxn 1 Sender
+    ==
+    assert
+
+    gtxn 1 Sender
+    txn Sender
+    ==
+    assert
+
+    // 4. Verify Txn 1 recipient is strictly this contract's application address
+    gtxn 1 Receiver
     global CurrentApplicationAddress
     ==
     assert
 
-    // Verify amount is strictly positive
+    // 5. Positive amounts assertion
     gtxn 0 Amount
     int 0
     >
     assert
+    gtxn 1 Amount
+    int 0
+    >
+    assert
 
-    // Update real on-chain accounting
+    // 6. Mathematical Exact Tax Split Verification:
+    // Tax is 10%, Net is 90%. Therefore: Net == Tax * 9
+    gtxn 1 Amount
+    int 9
+    *
+    gtxn 0 Amount
+    ==
+    assert
+
+    // 7. Update real on-chain accounting with Txn 1 Amount
     byte "total_tax_collected_x402"
     byte "total_tax_collected_x402"
     app_global_get
-    gtxn 0 Amount
+    gtxn 1 Amount
     +
     app_global_put
 
     byte "total_pooled"
     byte "total_pooled"
     app_global_get
-    gtxn 0 Amount
+    gtxn 1 Amount
     +
     app_global_put
 

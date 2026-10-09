@@ -13,9 +13,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from scripts.reality_gate import (
     verify_gate_1_teal_contract,
-    verify_gate_2_atomic_transaction_groups,
-    verify_gate_3_pqc_lattice_cryptography,
-    verify_gate_4_fee_pooling,
+    verify_gate_2_signed_atomic_groups,
+    verify_gate_3_sha512_256_commitments,
+    verify_gate_4_signed_fee_pooling,
     verify_gate_5_conway_engine,
     verify_gate_6_uhi_asa_params
 )
@@ -27,12 +27,12 @@ def main():
     print("=" * 78)
 
     layers = [
-        ("Layer 1: Smart Contracts (TEAL v9)", verify_gate_1_teal_contract),
-        ("Layer 2: x402 Bazaar Protocol (Atomic Groups)", verify_gate_2_atomic_transaction_groups),
-        ("Layer 3: Conway Automaton Engine (16x16)", verify_gate_5_conway_engine),
-        ("Layer 4: PQC & Falcon-1024 Security", verify_gate_3_pqc_lattice_cryptography),
-        ("Layer 5: UHI ASA Tokenomics", verify_gate_6_uhi_asa_params),
-        ("Layer 6: Reverse-Gas Fee Pooling Flow", verify_gate_4_fee_pooling),
+        ("Layer 1: Smart Contracts (TEAL v9 Compilation & Verification)", verify_gate_1_teal_contract),
+        ("Layer 2: x402 Bazaar Protocol (Cryptographically Signed Atomic Groups)", verify_gate_2_signed_atomic_groups),
+        ("Layer 3: Conway Automaton Engine (16x16 State Machine)", verify_gate_5_conway_engine),
+        ("Layer 4: PQC, Authentic FIPS SHA-512/256 & Falcon-1024 ASP", verify_gate_3_sha512_256_commitments),
+        ("Layer 5: UHI ASA Tokenomics (Non-Custodial Asset Standards)", verify_gate_6_uhi_asa_params),
+        ("Layer 6: Signed Reverse-Gas Fee Pooling (Zero Citizen Gas)", verify_gate_4_signed_fee_pooling),
     ]
 
     all_green = True

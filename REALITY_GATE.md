@@ -1,57 +1,88 @@
-# REALITY GATE AUDIT & VERIFICATION SPECIFICATION
+# REALITY GATE AUDIT & VERIFICATION SPECIFICATION (V2)
 
 ## Overview & The Strict Reality Principle
 
 > **Core Axiom:**  
 > *"Without verifying all technical layers as **Genuine Green** first, there is no reason to spend money, cycles, or transaction fees on Algorand MainNet. This is the only systematic, low-risk, and rigorous engineering route."*
 
-This document formalizes the **Reality Gate Security Audit** for the Universal High Income (UHI) Protocol on Algorand. It documents the eradication of mock data, the elimination of superficial assertions, and the implementation of genuine cryptographic and consensus checks.
+This document formalizes the **Reality Gate Security Audit V2** for the Universal High Income (UHI) Protocol on Algorand. It establishes rigorous criteria to eliminate mock data, stop superficial assertions, and enforce cryptographic and consensus reality gates.
 
 ---
 
-## 🔍 Security Audit Findings & Eradicated Flaws
+## 🔍 Detailed Code Audit & Specific Security Hardening
 
-During comprehensive code and protocol cross-checking against official Algorand documentation and cryptographic standards, three critical security vulnerabilities and two architectural shortcomings were identified and resolved:
+Following strict review against Algorand consensus specifications and cryptographic standards, the following critical issues were addressed:
 
-### 1. Automatic Human Verification (Sybil Vulnerability)
-- **Previous Flaw:** The TEAL contract's `handle_optin` block automatically assigned `is_verified_human = 1` to any opt-in address. This exposed the protocol to catastrophic Sybil attacks, allowing arbitrary bots to siphon UHI dividends.
-- **Strict Fix:** Automatic verification was completely eradicated. `handle_optin` now strictly initializes `is_verified_human = 0` (Pending/Unverified). Verification can only occur via `verify_human_citizen` through an authorized Oracle or Proof-of-Humanity validator.
+### 1. Hardened TEAL Smart Contract (`uhi_treasury_approval.teal`)
+- **Sybil Vulnerability Eradicated:** Automatic assignment of `is_verified_human = 1` during opt-in was eliminated. Opt-ins strictly default to `is_verified_human = 0` (Pending/Unverified). Citizen verification requires an explicit `verify_human_citizen` call by an authorized Oracle.
+- **Safe Treasury Accounting:** `total_pooled` is initialized strictly to `0` (zero phantom balances).
+- **Complete 3-Transaction Group Enforcement:**
+  - `global GroupSize == 3` strictly asserted.
+  - Transaction 0: Consumer pays Provider (90% Net).
+  - Transaction 1: Consumer pays Treasury Application Address (10% Tax).
+  - Transaction 2: Consumer calls `deposit_x402_tax`.
+- **Payer Authorization:** Enforces `gtxn 0 Sender == gtxn 1 Sender == txn Sender` (the consumer who pays must be the account calling the contract).
+- **Mathematical Tax Split Proof On-Chain:**
+  - Enforces `gtxn 1 Amount * int 9 == gtxn 0 Amount` (proving that Tax is exactly 10% and Net is exactly 90% of the gross 100%).
+- **Genuine AVM Algod Node Compilation:**
+  - Both contracts are compiled directly against Algorand node (`/v2/teal/compile`).
+  - Approval Program Bytecode Hash: `4CAS2YHINU3XDLI2TZFRF6ETW7NPRRF3SSDXOI7ZUV47C72XFFXZGJFRDA`
+  - Clear State Program Bytecode Hash: `BY2CHYNOOWIGW3XXNQ267TT2OQATBUDUPQZAU6D2ITIZCP2OSWF2Y5AS3I`
 
-### 2. Unsafe Treasury Accounting & Phantom Balances
-- **Previous Flaw:** `handle_create` initialized `total_pooled` to a nonzero hardcoded constant without any on-chain funding. Additionally, `deposit_x402_tax` lacked group size and recipient address validation.
-- **Strict Fix:** `total_pooled` is strictly initialized to `0`. `op_deposit_x402_tax` now asserts `gtxn 0 Receiver == global CurrentApplicationAddress`, `gtxn 0 Amount > 0`, and `global GroupSize >= 2`.
+### 2. Cryptographically Signed Atomic Groups (`algosdk` + Ed25519)
+- Rather than merely verifying basic arithmetic, `algosdk` constructs authentic Algorand transaction objects (`PaymentTxn`, `ApplicationNoOpTxn`).
+- The 32-byte group ID is derived via `calculate_group_id` and assigned to all transactions.
+- All transactions are signed with the consumer's private key (`tx.sign()`).
+- Signatures are cryptographically verified against the sender's Ed25519 public key using `nacl.signing.VerifyKey` over the canonical Algorand message serialization (`b"TX" + msgpack(txn)`).
+- Tamper-resistance is proven by verifying that altering the transaction amount or payload invalidates cryptographic verification.
 
-### 3. Falcon Cryptography vs. Algorand Account Standards
-- **Previous Flaw:** Tests used artificial string length checks (`len >= 32`) and mischaracterized Falcon-512 as an account-level standard.
-- **Strict Fix:** 
-  - Corrected technical specifications: Algorand's native State Proof standard deploys **Falcon-1024 (`f1`)**, which is distinct from NIST FIPS 204 (ML-DSA).
-  - Implemented real mathematical lattice vector norm checks ($||s||_2 \le 1.1 \sigma \sqrt{2n}$) and SHA-512/256 digests. Malicious oversized vectors are rejected via negative reality tests.
+### 3. Authentic FIPS 180-4 SHA-512/256 vs Naive Truncation
+- Addressed the critical distinction between authentic SHA-512/256 and naive SHA-512 truncation.
+- True SHA-512/256 initializes distinct constant vectors (IVs) defined in NIST FIPS 180-4. Naively taking `sha512(m)[:32]` yields an invalid, non-standard hash.
+- Implemented `hashlib.new('sha512_256', message)` to ensure full compliance with Algorand State Proof (ASP) message formatting standards.
+- Clarified that Algorand consensus natively utilizes **Falcon-1024 (`f1`)** for State Proofs, distinguishing it from NIST FIPS 204 (ML-DSA).
 
-### 4. x402 Bazaar Atomic Group Simulation
-- **Previous Flaw:** Previous tests only validated basic percentage arithmetic (`gross * 0.10`) rather than actual Algorand transaction grouping.
-- **Strict Fix:** Uses `algosdk` to generate authentic Algorand transaction objects (`PaymentTxn`, `ApplicationNoOpTxn`), cryptographically derives the 32-byte group ID via `calculate_group_id`, and executes negative tamper-resistance tests.
-
-### 5. Reverse-Gas Fee Pooling
-- **Previous Flaw:** Simply checked a local variable `citizen_gas_cost = 0.0`.
-- **Strict Fix:** Modeled the authentic Algorand consensus fee pooling rule where an atomic group sponsor covers `fee = 2000` microAlgos while the citizen transaction specifies `fee = 0`. Algorand consensus validates `total_fees >= group_size * min_fee`.
+### 4. Signed Reverse-Gas Fee Pooling
+- Rather than evaluating a trivial `fee = 0.0` variable, the test suite constructs an authentic 2-transaction fee-pooled atomic group:
+  - Sponsor Transaction specifies `fee = 2000` microAlgos.
+  - Citizen Beneficiary Transaction specifies `fee = 0` microAlgos.
+  - Both transactions are cryptographically signed.
+  - Algorand's consensus rule (`sum(fees) >= group_size * min_fee`) is verified, confirming zero out-of-pocket gas expense for the citizen.
 
 ---
 
-## 🚦 Reality Gate Matrix
+## 🚦 Reality Gate Matrix (V2)
 
-| Gate | Target Component | Reality Verification Mechanism | Result |
+| Reality Gate | Component | Real Verification Mechanism | Status |
 |---|---|---|---|
-| **Gate 1** | TEAL Smart Contract | Sybil opt-in rejection check (`is_verified_human = 0`), zero phantom balance check, recipient address assertion. | **GENUINE PASS** |
-| **Gate 2** | x402 Atomic Groups | Real `algosdk` transaction generation, 32-byte group ID calculation, tamper rejection. | **GENUINE PASS** |
-| **Gate 3** | PQC Lattice Cryptography | Real SHA-512/256 commitment, Falcon-1024 Euclidean norm bound verification, adversary rejection. | **GENUINE PASS** |
-| **Gate 4** | Reverse-Gas Fee Pooling | Algorand group fee pooling rule verification (`sum(fees) >= 2 * min_fee`, citizen fee = 0). | **GENUINE PASS** |
-| **Gate 5** | Conway Automaton Grid | 10-generation step simulation of Game of Life B3/S23, deterministic basis points bounding [10000, 15000]. | **GENUINE PASS** |
-| **Gate 6** | UHI ASA Specification | 6 decimals, unit name `UHI`, 1B total supply, `freeze=None`, `clawback=None` (non-custodial). | **GENUINE PASS** |
+| **Gate 1** | TEAL Smart Contract | Sybil opt-in rejection (`is_verified_human = 0`), zero phantom balance (`total_pooled = 0`), complete 3-txn group enforcement, exact 9x tax split (`Tax * 9 == Net`), payer authorization, and genuine Algod AVM compilation (`4CAS2...`). | **REALITY PASSED** |
+| **Gate 2** | x402 Atomic Groups | Full 3-transaction group generated with `algosdk`, cryptographically signed, and verified via Ed25519 (`nacl.signing.VerifyKey`). Tamper-resistance confirmed. | **REALITY PASSED** |
+| **Gate 3** | State Commitments | Authentic FIPS 180-4 SHA-512/256 implementation (`hashlib.new('sha512_256')`) with proof of distinction from truncated SHA-512. Falcon-1024 spec validation. | **REALITY PASSED** |
+| **Gate 4** | Reverse-Gas Flow | Signed fee-pooling group where sponsor pays 2000 microAlgos and citizen pays 0 microAlgos, verified under Algorand consensus fee pooling rules. | **REALITY PASSED** |
+| **Gate 5** | Conway Automaton Grid | 10-generation step simulation of Game of Life B3/S23, deterministic basis points bounds [10000, 15000]. | **REALITY PASSED** |
+| **Gate 6** | UHI ASA Specification | 6 decimals, unit name `UHI`, 1B total supply, `freeze=None`, `clawback=None` (non-custodial). | **REALITY PASSED** |
 
 ---
 
-## 🚫 MainNet Deployment Notice
+## 📋 Comprehensive Status Assessment
 
-- **Current Status:** ALPHA / LOCALNET & SANDBOX ENGINE.
-- **MainNet Readiness:** **NOT READY FOR MAINNET EXPENDITURE.**
-- **Directive:** No real ALGO or cycles should be spent on MainNet until complete LocalNet testing, TestNet stress-testing, and an independent formal smart contract audit have concluded.
+| Area | Current Reality Status | Notes |
+|---|---|---|
+| **Repository Creation** | **PASS** | Live at `github.com/elon00/uhi-algorand-protocol`. |
+| **GitHub Metadata & About** | **PASS** | Description and topics configured. |
+| **CI/CD Pipeline** | **PASS** | GitHub Actions running Python 3.11 with `py-algorand-sdk` and `pynacl`. |
+| **Security Hardening** | **PASS** | Sybil opt-in removed, phantom balances removed, atomic 3-txn structure enforced. |
+| **TEAL Node Compilation** | **PASS** | Successfully compiled on Algorand Algod AVM node (`4CAS2...`). |
+| **Local Invariant Reality Gates** | **PASS** | Signed atomic groups, true SHA-512/256, and fee pooling verified. |
+| **On-Chain Contract Execution** | **IN PROGRESS** | Pending execution on Algorand LocalNet / Sandbox test harness. |
+| **Falcon AVM Verification** | **IN PROGRESS** | Algorand State Proof opcodes require node-level consensus execution. |
+| **MainNet Deployment** | **DEFERRED** | **Zero-Spend Policy Active.** No real ALGO or cycles should be spent. |
+
+---
+
+## 🚫 MainNet Zero-Spend Directive
+
+The protocol strictly forbids spending real funds on Algorand MainNet at this stage. MainNet deployment will only be scheduled after:
+1. LocalNet / Sandbox end-to-end integration testing.
+2. TestNet public faucet stress-testing.
+3. Third-party professional security audit of TEAL smart contracts.
