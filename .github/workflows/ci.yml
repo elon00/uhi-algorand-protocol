@@ -1,0 +1,28 @@
+name: UHI Algorand Protocol CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  verify-layers:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Multi-Layer Genuine Green Verification Pipeline
+        run: |
+          python scripts/verify_all_layers.py
+
+      - name: Run Comprehensive Invariant Test Suite
+        run: |
+          python tests/test_uhi_algorand_layers.py

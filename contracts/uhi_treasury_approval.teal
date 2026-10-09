@@ -1,0 +1,267 @@
+#pragma version 9
+// =========================================================================
+// UHI Protocol: Universal High Income Treasury & Distribution on Algorand
+// Application ID Approval Program
+// =========================================================================
+
+// Handle Creation
+txn ApplicationID
+int 0
+==
+bnz handle_create
+
+// Handle OptIn
+txn OnCompletion
+int OptIn
+==
+bnz handle_optin
+
+// Handle CloseOut
+txn OnCompletion
+int CloseOut
+==
+bnz handle_closeout
+
+// Handle Update / Delete (Restricted to Creator)
+txn OnCompletion
+int UpdateApplication
+==
+txn OnCompletion
+int DeleteApplication
+==
+||
+bnz handle_admin_only
+
+// Handle NoOp (Standard Calls)
+txn OnCompletion
+int NoOp
+==
+bnz handle_noop
+
+err
+
+// -------------------------------------------------------------------------
+// Creation Initialization
+// -------------------------------------------------------------------------
+handle_create:
+    byte "creator"
+    txn Sender
+    app_global_put
+
+    byte "current_epoch"
+    int 1
+    app_global_put
+
+    byte "base_payout"
+    int 500000000 // 500.000000 UHI (6 decimals)
+    app_global_put
+
+    byte "dynamic_multiplier_bps"
+    int 12500 // 1.25x (12500 basis points)
+    app_global_put
+
+    byte "total_pooled"
+    int 10000000000000 // Initial pool
+    app_global_put
+
+    byte "total_tax_collected_x402"
+    int 0
+    app_global_put
+
+    byte "total_claims_count"
+    int 0
+    app_global_put
+
+    int 1
+    return
+
+// -------------------------------------------------------------------------
+// User OptIn (Citizen Registration)
+// -------------------------------------------------------------------------
+handle_optin:
+    // Initialize citizen local state: last_claim_epoch = 0, is_verified = 1
+    txn Sender
+    byte "last_claim_epoch"
+    int 0
+    app_local_put
+
+    txn Sender
+    byte "is_verified_human"
+    int 1
+    app_local_put
+
+    int 1
+    return
+
+handle_closeout:
+    int 1
+    return
+
+handle_admin_only:
+    txn Sender
+    byte "creator"
+    app_global_get
+    ==
+    return
+
+// -------------------------------------------------------------------------
+// Route NoOp Operations
+// -------------------------------------------------------------------------
+handle_noop:
+    txna ApplicationArgs 0
+    byte "deposit_x402_tax"
+    ==
+    bnz op_deposit_x402_tax
+
+    txna ApplicationArgs 0
+    byte "claim_uhi_dividend"
+    ==
+    bnz op_claim_uhi_dividend
+
+    txna ApplicationArgs 0
+    byte "advance_epoch"
+    ==
+    bnz op_advance_epoch
+
+    txna ApplicationArgs 0
+    byte "update_conway_multiplier"
+    ==
+    bnz op_update_conway_multiplier
+
+    err
+
+// -------------------------------------------------------------------------
+// Method: deposit_x402_tax
+// Invoked within an Atomic Transaction Group where payment accompanies call
+// -------------------------------------------------------------------------
+op_deposit_x402_tax:
+    // Verify previous transaction in group was a payment to this app
+    gtxn 0 TypeEnum
+    int pay
+    ==
+    gtxn 0 TypeEnum
+    int axfer
+    ==
+    ||
+    assert
+
+    // Update global total tax collected
+    byte "total_tax_collected_x402"
+    byte "total_tax_collected_x402"
+    app_global_get
+    gtxn 0 Amount
+    +
+    app_global_put
+
+    // Update global treasury balance
+    byte "total_pooled"
+    byte "total_pooled"
+    app_global_get
+    gtxn 0 Amount
+    +
+    app_global_put
+
+    int 1
+    return
+
+// -------------------------------------------------------------------------
+// Method: claim_uhi_dividend
+// Args: ["claim_uhi_dividend", pqc_falcon_proof_bytes]
+// -------------------------------------------------------------------------
+op_claim_uhi_dividend:
+    // Check citizen is opted-in & verified
+    txn Sender
+    byte "is_verified_human"
+    app_local_get
+    int 1
+    ==
+    assert
+
+    // Check citizen hasn't claimed in current epoch
+    txn Sender
+    byte "last_claim_epoch"
+    app_local_get
+    byte "current_epoch"
+    app_global_get
+    <
+    assert
+
+    // Check PQC / Falcon proof length (must have signature)
+    txn NumAppArgs
+    int 2
+    >=
+    assert
+    txna ApplicationArgs 1
+    len
+    int 32
+    >=
+    assert
+
+    // Update citizen's last claim epoch
+    txn Sender
+    byte "last_claim_epoch"
+    byte "current_epoch"
+    app_global_get
+    app_local_put
+
+    // Increment global claim count
+    byte "total_claims_count"
+    byte "total_claims_count"
+    app_global_get
+    int 1
+    +
+    app_global_put
+
+    int 1
+    return
+
+// -------------------------------------------------------------------------
+// Method: update_conway_multiplier
+// Args: ["update_conway_multiplier", new_multiplier_bps]
+// -------------------------------------------------------------------------
+op_update_conway_multiplier:
+    txn NumAppArgs
+    int 2
+    ==
+    assert
+
+    // Only allow multipliers between 10000 (1.0x) and 15000 (1.5x)
+    txna ApplicationArgs 1
+    btoi
+    store 1 // new_multiplier
+
+    load 1
+    int 10000
+    >=
+    load 1
+    int 15000
+    <=
+    &&
+    assert
+
+    byte "dynamic_multiplier_bps"
+    load 1
+    app_global_put
+
+    int 1
+    return
+
+// -------------------------------------------------------------------------
+// Method: advance_epoch
+// -------------------------------------------------------------------------
+op_advance_epoch:
+    txn Sender
+    byte "creator"
+    app_global_get
+    ==
+    assert
+
+    byte "current_epoch"
+    byte "current_epoch"
+    app_global_get
+    int 1
+    +
+    app_global_put
+
+    int 1
+    return

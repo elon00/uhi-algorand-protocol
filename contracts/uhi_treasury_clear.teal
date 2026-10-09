@@ -1,0 +1,4 @@
+#pragma version 9
+// UHI Protocol: Clear State Program (Always Approve)
+int 1
+return
