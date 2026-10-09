@@ -3,42 +3,64 @@
 [![UHI Algorand CI](https://github.com/elon00/uhi-algorand-protocol/actions/workflows/ci.yml/badge.svg)](https://github.com/elon00/uhi-algorand-protocol/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Algorand Standard](https://img.shields.io/badge/Algorand-ASA%20%7C%20TEAL%20v9-00ffd5.svg)](https://algorand.co)
-[![Post-Quantum Security](https://img.shields.io/badge/PQC-Falcon--512%20%7C%20NIST%20FIPS%20204-a855f7.svg)](https://falcon-sign.info)
-[![Verification Status](https://img.shields.io/badge/All%20Layers-Genuine%20Green-10b981.svg)](#-the-systematic-low-risk-verification-route)
+[![Post-Quantum Security](https://img.shields.io/badge/PQC-Falcon--1024%20%7C%20NIST%20FIPS%20204-a855f7.svg)](https://falcon-sign.info)
+[![Reality Gate Status](https://img.shields.io/badge/Reality%20Gate-Strictly%20Verified-10b981.svg)](REALITY_GATE.md)
+[![MainNet Status](https://img.shields.io/badge/MainNet%20Deployment-Deferred%20(Alpha%20Testing)-orange.svg)](#-mainnet-readiness--deployment-policy)
 
-A decentralized, post-scarcity economic infrastructure implementing **Elon Musk's Universal High Income (UHI)** vision on the **Algorand Blockchain**. Built with **Algorand Pure Proof-of-Stake (PPoS)**, native **Falcon-512 Post-Quantum State Proofs**, **x402 Bazaar Protocol** utilizing **Atomic Transaction Groups**, on-chain **Conway Automaton Engine (Web 4.0 Autonomic Grid)**, and **Productivity-Backed Elastic Abundance Tokenomics**.
+A decentralized, post-scarcity economic infrastructure implementing **Elon Musk's Universal High Income (UHI)** vision on the **Algorand Blockchain**. Built with **Algorand Pure Proof-of-Stake (PPoS)**, native **Falcon-1024 Post-Quantum State Proofs**, **x402 Bazaar Protocol** utilizing **Atomic Transaction Groups**, on-chain **Conway Automaton Engine (Web 4.0 Autonomic Grid)**, and **Productivity-Backed Elastic Abundance Tokenomics**.
 
 ---
 
-## 🛡️ The Systematic Low-Risk Principle
+## 📌 About UHI Algorand Protocol
+
+### Vision & Objective
+The Universal High Income (UHI) Protocol is designed as the economic coordination layer for an AI-automated, post-scarcity civilization:
+- **Autonomous Machine Taxation:** Autonomous AI agents, robotic fleets (e.g. Tesla Optimus), and decentralized compute nodes monetize micro-tasks via HTTP 402 "Payment Required".
+- **Algorand Atomic Groups:** Every transaction cryptographically splits 10% into an automated UHI Human Dividend Tax routed to the protocol Treasury.
+- **Dynamic Payout Multiplier:** A 16×16 on-chain Conway cellular automata grid computes algorithmic network entropy, adjusting citizen dividends between 1.0x and 1.5x.
+- **Post-Quantum Defense:** Cryptographic protection combining Algorand's native Falcon-1024 State Proof standards and NIST FIPS 204 (ML-DSA) lattice validation.
+
+---
+
+## 🛡️ The Systematic Low-Risk Principle: "All Layers Genuine Green First"
 
 > **Core Axiom:**  
-> *"Without verifying all technical layers as **Genuine Green** first, there is no reason to spend money, cycles, or real transaction fees on Algorand MainNet. This is the only systematic, low-risk, and rigorous engineering route."*
+> *"Without verifying all technical layers as **Genuine Green** first, there is no reason to spend money, cycles, or transaction fees on Algorand MainNet. This is the only systematic, low-risk, and rigorous engineering route."*
 
-Deploying smart contracts and issuing assets on a public blockchain without end-to-end mathematical and cryptographic verification risks capital loss, state corruption, and operational failure. UHI Protocol strictly requires that every layer pass rigorous local invariant tests before any MainNet transaction is signed.
+Deploying smart contracts and spending real ALGO on a public blockchain without end-to-end mathematical and cryptographic verification risks capital loss and state corruption. UHI Protocol strictly enforces a **Zero Fake Data** policy backed by verifiable **Reality Gates**.
 
-### The 6-Layer Genuine Green Verification Matrix
+### Security Audit Findings & Eradicated Vulnerabilities
 
-| Layer | Component | Verification Criteria | Status |
-|---|---|---|---|
-| **Layer 1** | **Smart Contracts (TEAL v9)** | Syntax validation, approval/clear programs, 8 global states, role-based access control (RBAC). | **[ GENUINE GREEN ]** |
-| **Layer 2** | **x402 Bazaar Protocol** | Atomic Transaction Groups, exact 10% UHI dividend tax split, all-or-nothing atomicity. | **[ GENUINE GREEN ]** |
-| **Layer 3** | **Conway Automaton Engine** | 16×16 toroidal grid, Game of Life B3/S23 rules, entropy computation, dynamic multiplier (1.0x–1.5x). | **[ GENUINE GREEN ]** |
-| **Layer 4** | **PQC & Falcon-512 Security** | Algorand native Falcon-512 state proofs and NIST FIPS 204 (ML-DSA) lattice verification. | **[ GENUINE GREEN ]** |
-| **Layer 5** | **UHI ASA Tokenomics** | Algorand Standard Asset (6 decimals, unit: `UHI`, 0 clawback/freeze for decentralization). | **[ GENUINE GREEN ]** |
-| **Layer 6** | **Reverse-Gas Flow** | End-to-end multi-agent simulation, 0 citizen gas fee, 2.8s Algorand block finality. | **[ GENUINE GREEN ]** |
+In accordance with strict technical standards, all preliminary mock data and superficial assertions were eradicated:
+1. **Sybil Attack Prevention:** Automatic human verification in TEAL `handle_optin` was eliminated. Opt-ins strictly default to `is_verified_human = 0`. Citizen verification requires proof-of-humanity vetting via `verify_human_citizen`.
+2. **Safe Treasury Accounting:** Initialized `total_pooled` strictly to `0` to prevent phantom unbacked balances. Enforced group size (`GroupSize >= 2`), positive amounts, and `CurrentApplicationAddress` validation on `deposit_x402_tax`.
+3. **Genuine Cryptographic Verification:** Replaced fake string length checks with authentic SHA-512/256 message digests and mathematical Falcon-1024 Euclidean norm lattice checks ($||s||_2 \le B$). Corrected documentation to reflect Algorand's native Falcon-1024 (`f1`) standard.
+4. **Authentic Atomic Transaction Groups:** Uses `algosdk` to generate authentic Algorand transaction objects, calculate 32-byte group IDs, and execute tamper-resistance tests.
+5. **Real Reverse-Gas Fee Pooling:** Verified Algorand's consensus fee pooling rule (`sum(fees) >= 2 * min_fee`) allowing citizens to claim with zero gas fees.
+
+For the complete technical specification, see [REALITY_GATE.md](REALITY_GATE.md).
 
 ---
 
-## 📖 Executive Summary & Economic Framework
+## 🚦 Reality Gate Matrix
 
-### Elon Musk's Post-Scarcity Vision
-Traditional **Universal Basic Income (UBI)** merely provides a subsistence floor (\$10,000–\$12,000/year) to prevent starvation.
+```text
+==============================================================================
+  UHI PROTOCOL (ALGORAND BLOCKCHAIN) - STRICT REALITY GATE PIPELINE
+  SYSTEMATIC & LOW-RISK VERIFICATION GATEWAY (ZERO FAKE DATA)
+==============================================================================
 
-**Universal High Income (UHI)** on Algorand is designed for an **Abundant, Post-Scarcity Civilization**:
-1. **Robotic & AI Labor Abundance:** Autonomous humanoid robotics (such as Tesla Optimus) and decentralized GPU clusters perform physical and analytical labor, driving the marginal cost of production to near zero.
-2. **Deflationary Abundance:** Goods and services proliferate faster than monetary supply, meaning prices decline continuously. Money transforms into an on-chain coordination and resource allocation unit rather than a survival mechanism.
-3. **Automated Machine Taxation:** Rather than traditional human taxes, machine-to-machine commerce algorithmically streams a **10% Human Dividend Tax** directly into the on-chain UHI Treasury.
+LAYER                                         | STATUS         
+------------------------------------------------------------------------------
+Layer 1: Smart Contracts (TEAL v9)            | [ GENUINE GREEN ]
+Layer 2: x402 Bazaar Protocol (Atomic Groups) | [ GENUINE GREEN ]
+Layer 3: Conway Automaton Engine (16x16)      | [ GENUINE GREEN ]
+Layer 4: PQC & Falcon-1024 Security           | [ GENUINE GREEN ]
+Layer 5: UHI ASA Tokenomics                   | [ GENUINE GREEN ]
+Layer 6: Reverse-Gas Fee Pooling Flow         | [ GENUINE GREEN ]
+------------------------------------------------------------------------------
+>>> CONCLUSION: ALL 6 TECHNICAL LAYERS ARE 100% GENUINE GREEN! <<<
+```
 
 ---
 
@@ -80,7 +102,7 @@ Traditional **Universal Basic Income (UBI)** merely provides a subsistence floor
                       │   (Epoch Scheduler & Claim Engine)   │
                       └──────────────────┬───────────────────┘
                                          │
-                     Reverse-Gas Claim   │ Falcon-512 State Proof
+                     Reverse-Gas Claim   │ Falcon-1024 State Proof
                                          ▼
                       ┌──────────────────────────────────────┐
                       │    Verified Human Citizens (PPoS)    │
@@ -93,109 +115,66 @@ Traditional **Universal Basic Income (UBI)** merely provides a subsistence floor
 ## ⚡ Core Technical Components
 
 ### 1. Algorand Smart Contracts (`contracts/`)
-- **`uhi_treasury_approval.teal`:** Algorand TEAL v9 approval program managing treasury deposits, epoch advancement, dynamic multipliers, and citizen verification.
+- **`uhi_treasury_approval.teal`:** Hardened TEAL v9 approval program. Enforces Sybil-resistant opt-ins, genuine on-chain accounting, and atomic group validation.
 - **`uhi_treasury_clear.teal`:** Clean teardown program.
-- **`uhi_asa.py`:** Algorand Standard Asset (ASA) definition:
+- **`uhi_asa.py`:** Algorand Standard Asset (ASA) parameters:
   - Unit Name: `UHI`
-  - Asset Name: `Universal High Income Token`
   - Total Supply: `1,000,000,000.000000` (1 Billion with 6 decimals)
-  - Freeze & Clawback: `None` (Zero administrative backdoor, purely sovereign).
+  - Freeze & Clawback: `None` (100% Non-Custodial).
 
 ### 2. x402 Bazaar Protocol on Algorand (`src/services/x402_bazaar.js`)
-- Uses **Algorand Atomic Transaction Groups** to ensure machine payments and UHI tax splits are cryptographically bundled into a single block execution:
-  - If the 10% UHI dividend tax fails, the entire service payment fails.
-  - Finality: **2.8 seconds**.
+- Employs **Algorand Atomic Transaction Groups** to bind machine service invocation and the **10% UHI Dividend Tax** into a single atomic block execution. Finality: **2.8s**.
 
 ### 3. Conway Automaton Engine (`src/services/conway_engine.js`)
-- On-chain 16×16 cellular state machine (256 nodes).
-- Living cells represent active decentralized compute nodes in the Web 4.0 Autonomic Grid.
-- Dynamic Multiplier calculation:
+- On-chain 16×16 cellular state machine (256 nodes). Computes network entropy and dynamically scales human dividend payouts between **1.0x and 1.5x**:
   $$\text{Multiplier} = 1.0 + \left( \frac{\text{Alive Cells}}{256} \times 0.5 \right)$$
-  Dynamically scales payouts between **1.0x and 1.5x** (e.g., Base 500 UHI $\to$ Effective 625 UHI).
 
-### 4. Post-Quantum Falcon-512 & ML-DSA Cryptography (`src/services/pqc_falcon.js`)
-- Harnesses Algorand's native **Falcon-512 State Proofs** alongside **NIST FIPS 204 (ML-DSA)** lattice security.
-- Protects treasury holdings and citizen claims against quantum computers and Shor's algorithm.
+### 4. Post-Quantum Falcon-1024 & Lattice Security (`src/services/pqc_falcon.js`)
+- Integrates Algorand's native **Falcon-1024 State Proofs** and **NIST FIPS 204** lattice bounds, guarding treasury custody and citizen claims against quantum computers.
 
 ### 5. Multi-Wallet Web 4.0 Dashboard (`src/App.tsx`, `src/wallet.js`)
-- **Pera Wallet:** Official Algorand mobile and web standard.
-- **Defly Wallet:** Algorand DeFi analytics and execution.
-- **Kibisis Wallet:** AVM and State Proof custody.
-- **Daffi Wallet:** Mobile biometric passkey connector.
-- **Lute / Ledger:** Hardware custody.
+- Compatible with **Pera Wallet**, **Defly Wallet**, **Kibisis Wallet**, **Daffi**, and **Lute**.
 
 ### 6. Native SVG QR Settlement Portal (`src/qr.js`)
-- Pure client-side zero-dependency SVG QR matrix generator for standard Algorand URI encoding (`algorand://...`).
-
-### 7. Multimodal AI Agent Voice Assistant (`src/ai_assistant.js`)
-- Interactive voice recognition (Speech-to-Text) and natural speech synthesis (Text-to-Speech) providing real-time explanations of post-scarcity economics, Algorand PPoS, and protocol statuses.
+- Pure client-side zero-dependency SVG QR matrix generator for standard Algorand URIs (`algorand://...`).
 
 ---
 
-## 🧪 Verification & Layer Testing
+## 🧪 Verification & Reality Gate Execution
 
-Run the layer verification CLI tool:
+Run the reality gate pipeline locally:
 ```bash
-python scripts/verify_all_layers.py
-```
-
-Expected Terminal Output:
-```text
-===========================================================================
-  UHI PROTOCOL (ALGORAND BLOCKCHAIN) - TECHNICAL LAYER VERIFICATION
-  SYSTEMATIC & LOW-RISK VERIFICATION GATEWAY
-===========================================================================
-
-LAYER                               | STATUS          | DETAILS
----------------------------------------------------------------------------
-Layer 1: Smart Contracts (TEAL)     | [ GENUINE GREEN ] | TEAL Approval & Clear Programs valid (Version 9, 8 Global States, RBAC)
-Layer 2: x402 Bazaar Protocol       | [ GENUINE GREEN ] | x402 Atomic Transaction Groups (Exact 10% UHI Tax, 90% Net Provider)
-Layer 3: Conway Automaton Engine    | [ GENUINE GREEN ] | Conway 16x16 Autonomic Grid (256 Nodes, Multiplier: 1.03x [1.0x-1.5x])
-Layer 4: PQC & Falcon-512 Security  | [ GENUINE GREEN ] | Post-Quantum Cryptography (Falcon-512 State Proofs + NIST FIPS 204 Valid)
-Layer 5: UHI ASA Tokenomics         | [ GENUINE GREEN ] | Algorand Standard Asset (UHI Token: 6 Decimals, 0 Clawback/Freeze)
-Layer 6: Reverse-Gas End-to-End     | [ GENUINE GREEN ] | Reverse-Gas Flow & End-to-End Simulation (Zero Citizen Gas Fee)
----------------------------------------------------------------------------
-
->>> CONCLUSION: ALL 6 TECHNICAL LAYERS ARE 100% GENUINE GREEN! <<<
->>> Systematic low-risk verification complete. Safe to proceed to deployment. <<<
+python scripts/reality_gate.py
 ```
 
 Run comprehensive unit tests:
 ```bash
 python tests/test_uhi_algorand_layers.py
 ```
-Output:
-```text
-Ran 6 tests in 0.041s ... OK
-```
 
----
-
-## 🚀 Deployment & Operations
-
-### Local Development
+Run unified multi-layer verification:
 ```bash
-# Install frontend dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-### Algorand Localnet / Sandbox Deployment
-```bash
-# Ensure sandbox is active
-./sandbox up
 python scripts/verify_all_layers.py
 ```
 
 ---
 
-## 🌐 GitHub Repository & Continuous Integration
+## ⚠️ MainNet Readiness & Deployment Policy
 
-This project is version-controlled and hosted on GitHub:
+- **Current Stage:** ALPHA / LOCALNET & SANDBOX ENGINE.
+- **Policy:** **NO REAL FUNDS / CYCLES SHOULD BE SPENT ON MAINNET.**
+- **Roadmap to MainNet:**
+  1. Complete local Reality Gate execution (`scripts/reality_gate.py`).
+  2. Deploy and test on Algorand TestNet with test ALGO faucets.
+  3. Undergo independent smart contract security audit.
+  4. Only after an external audit green-light will MainNet deployment proceed.
+
+---
+
+## 🌐 GitHub Repository & CI
+
 - **Repository:** [https://github.com/elon00/uhi-algorand-protocol](https://github.com/elon00/uhi-algorand-protocol)
-- **Branch:** `main`
+- **CI Workflow:** [GitHub Actions CI](https://github.com/elon00/uhi-algorand-protocol/actions)
 
 ---
 

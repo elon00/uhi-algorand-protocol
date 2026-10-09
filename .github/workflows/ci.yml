@@ -19,6 +19,11 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install Python Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install py-algorand-sdk
+
       - name: Run Multi-Layer Genuine Green Verification Pipeline
         run: |
           python scripts/verify_all_layers.py

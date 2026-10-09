@@ -1,7 +1,7 @@
 #pragma version 9
 // =========================================================================
 // UHI Protocol: Universal High Income Treasury & Distribution on Algorand
-// Application ID Approval Program
+// Application Approval Program (Production-Hardened with Strict Reality Gates)
 // =========================================================================
 
 // Handle Creation
@@ -10,7 +10,7 @@ int 0
 ==
 bnz handle_create
 
-// Handle OptIn
+// Handle OptIn (Citizen Registration - Default UNVERIFIED)
 txn OnCompletion
 int OptIn
 ==
@@ -22,7 +22,7 @@ int CloseOut
 ==
 bnz handle_closeout
 
-// Handle Update / Delete (Restricted to Creator)
+// Handle Update / Delete (Strictly Restricted to Creator)
 txn OnCompletion
 int UpdateApplication
 ==
@@ -41,10 +41,14 @@ bnz handle_noop
 err
 
 // -------------------------------------------------------------------------
-// Creation Initialization
+// Creation Initialization (ZERO PHANTOM BALANCES)
 // -------------------------------------------------------------------------
 handle_create:
     byte "creator"
+    txn Sender
+    app_global_put
+
+    byte "oracle_verifier"
     txn Sender
     app_global_put
 
@@ -57,11 +61,11 @@ handle_create:
     app_global_put
 
     byte "dynamic_multiplier_bps"
-    int 12500 // 1.25x (12500 basis points)
+    int 10000 // 1.00x Base (10000 basis points)
     app_global_put
 
     byte "total_pooled"
-    int 10000000000000 // Initial pool
+    int 0 // Strict Reality: Zero phantom balance. Must be funded via real on-chain transfers!
     app_global_put
 
     byte "total_tax_collected_x402"
@@ -76,18 +80,20 @@ handle_create:
     return
 
 // -------------------------------------------------------------------------
-// User OptIn (Citizen Registration)
+// Citizen OptIn: Strict Sybil Prevention
+// Default status is 0 (Unverified). Automatic verification is strictly eliminated!
 // -------------------------------------------------------------------------
 handle_optin:
-    // Initialize citizen local state: last_claim_epoch = 0, is_verified = 1
     txn Sender
     byte "last_claim_epoch"
     int 0
     app_local_put
 
+    // SECURITY FIX: Never grant automatic verification on opt-in!
+    // Citizen must be vetted via verify_human_citizen oracle method.
     txn Sender
     byte "is_verified_human"
-    int 1
+    int 0
     app_local_put
 
     int 1
@@ -108,6 +114,11 @@ handle_admin_only:
 // Route NoOp Operations
 // -------------------------------------------------------------------------
 handle_noop:
+    txna ApplicationArgs 0
+    byte "verify_human_citizen"
+    ==
+    bnz op_verify_human_citizen
+
     txna ApplicationArgs 0
     byte "deposit_x402_tax"
     ==
@@ -131,11 +142,50 @@ handle_noop:
     err
 
 // -------------------------------------------------------------------------
+// Method: verify_human_citizen
+// Proof-of-Humanity gating: Can only be called by authorized Oracle/Admin
+// Args: ["verify_human_citizen", target_account_address]
+// -------------------------------------------------------------------------
+op_verify_human_citizen:
+    // Only authorized oracle or creator can verify humanity
+    txn Sender
+    byte "oracle_verifier"
+    app_global_get
+    ==
+    txn Sender
+    byte "creator"
+    app_global_get
+    ==
+    ||
+    assert
+
+    // Target must be provided in Accounts array (index 1)
+    txn NumAccounts
+    int 1
+    >=
+    assert
+
+    // Mark verified in target's local storage
+    txna Accounts 1
+    byte "is_verified_human"
+    int 1
+    app_local_put
+
+    int 1
+    return
+
+// -------------------------------------------------------------------------
 // Method: deposit_x402_tax
-// Invoked within an Atomic Transaction Group where payment accompanies call
+// Strict Atomic Group Validation: Enforces recipient, group size, and positive amount
 // -------------------------------------------------------------------------
 op_deposit_x402_tax:
-    // Verify previous transaction in group was a payment to this app
+    // Group must contain at least 2 transactions (Payment + App Call)
+    global GroupSize
+    int 2
+    >=
+    assert
+
+    // Verify first transaction is a real payment or asset transfer
     gtxn 0 TypeEnum
     int pay
     ==
@@ -145,7 +195,19 @@ op_deposit_x402_tax:
     ||
     assert
 
-    // Update global total tax collected
+    // Verify payment recipient is strictly this contract's application address
+    gtxn 0 Receiver
+    global CurrentApplicationAddress
+    ==
+    assert
+
+    // Verify amount is strictly positive
+    gtxn 0 Amount
+    int 0
+    >
+    assert
+
+    // Update real on-chain accounting
     byte "total_tax_collected_x402"
     byte "total_tax_collected_x402"
     app_global_get
@@ -153,7 +215,6 @@ op_deposit_x402_tax:
     +
     app_global_put
 
-    // Update global treasury balance
     byte "total_pooled"
     byte "total_pooled"
     app_global_get
@@ -169,7 +230,7 @@ op_deposit_x402_tax:
 // Args: ["claim_uhi_dividend", pqc_falcon_proof_bytes]
 // -------------------------------------------------------------------------
 op_claim_uhi_dividend:
-    // Check citizen is opted-in & verified
+    // 1. Citizen MUST be verified through genuine Proof-of-Humanity
     txn Sender
     byte "is_verified_human"
     app_local_get
@@ -177,7 +238,7 @@ op_claim_uhi_dividend:
     ==
     assert
 
-    // Check citizen hasn't claimed in current epoch
+    // 2. Strict Sybil & Double-Claim check: Cannot claim twice in the same epoch
     txn Sender
     byte "last_claim_epoch"
     app_local_get
@@ -186,25 +247,24 @@ op_claim_uhi_dividend:
     <
     assert
 
-    // Check PQC / Falcon proof length (must have signature)
+    // 3. PQC proof must be provided
     txn NumAppArgs
     int 2
     >=
     assert
     txna ApplicationArgs 1
     len
-    int 32
+    int 64
     >=
     assert
 
-    // Update citizen's last claim epoch
+    // Update citizen's local state
     txn Sender
     byte "last_claim_epoch"
     byte "current_epoch"
     app_global_get
     app_local_put
 
-    // Increment global claim count
     byte "total_claims_count"
     byte "total_claims_count"
     app_global_get
@@ -220,15 +280,26 @@ op_claim_uhi_dividend:
 // Args: ["update_conway_multiplier", new_multiplier_bps]
 // -------------------------------------------------------------------------
 op_update_conway_multiplier:
+    txn Sender
+    byte "creator"
+    app_global_get
+    ==
+    txn Sender
+    byte "oracle_verifier"
+    app_global_get
+    ==
+    ||
+    assert
+
     txn NumAppArgs
     int 2
     ==
     assert
 
-    // Only allow multipliers between 10000 (1.0x) and 15000 (1.5x)
+    // Only allow multipliers between 10000 (1.00x) and 15000 (1.50x)
     txna ApplicationArgs 1
     btoi
-    store 1 // new_multiplier
+    store 1
 
     load 1
     int 10000
