@@ -1,0 +1,12 @@
+{
+  "name": "uhi-algorand-protocol",
+  "chain": "EVM (Ethereum / Base / Polygon / Arbitrum)",
+  "distDir": "dist",
+  "storage": {
+    "provider": "ipfs",
+    "pin": true
+  },
+  "domains": [
+    "uhi-algorand-protocol.eth.limo"
+  ]
+}
